@@ -460,6 +460,18 @@
         .btn-secondary:hover, .btn-warning:hover {
             transform: translateY(-2px);
             box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
+            
+        #previewSection {
+            display: none;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
 
         /* ── Per-page extra styles ── */
         {% block extra_styles %}{% endblock %}
