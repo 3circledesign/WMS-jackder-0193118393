@@ -1,4 +1,5 @@
 import os
+import platform
 from collections import defaultdict
 from io import BytesIO
 from wtforms import StringField, IntegerField, TextAreaField, FieldList, FormField, SubmitField
