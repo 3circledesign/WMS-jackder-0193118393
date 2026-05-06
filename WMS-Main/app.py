@@ -43,6 +43,19 @@ app = create_app()
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+def premium_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for('login'))
+        if current_user.is_admin:
+            return f(*args, **kwargs)
+        if current_user.plan != 'premium':
+            flash('This feature requires a Premium plan.', 'warning')
+            return redirect(url_for('dashboard'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 def permission_required(permission):
     """Decorator: admin always passes. Non-admins need the specific permission."""
     def decorator(f):
@@ -74,6 +87,7 @@ def inventory_sync():
     return render_template('inventory_sync.html')
 
 @app.route('/preview-stock', methods=['POST'])
+@premium_required
 @login_required
 def preview_stock():
     if 'file' not in request.files:
@@ -294,6 +308,7 @@ def save_stock(stock_id):
         return jsonify({'error': f'Error updating stock: {str(e)}'}), 500
 
 @app.route('/upload-sku-excel', methods=['GET', 'POST'])
+@premium_required
 @login_required
 def upload_sku_excel():
     if request.method == 'POST':
@@ -981,6 +996,7 @@ def adjust_stock(stock_id):
 
 
 @app.route('/daily-rack-count')
+@premium_required
 @login_required
 def daily_rack_count():
     """Display daily rack count data table with automatic filling of missing days (up to today only)"""
@@ -1093,6 +1109,7 @@ def daily_rack_count():
     )
 
 @app.route('/daily-orders')
+@premium_required
 @login_required
 def daily_orders():
     """Display daily order creation count"""
@@ -2359,6 +2376,7 @@ from collections import defaultdict
 import re
 
 @app.route('/rack-status')
+@premium_required
 @login_required
 def rack_status():
 
@@ -2656,7 +2674,7 @@ def admin_register():
             return redirect(url_for('admin_register'))
 
         # Automatically assign admin status
-        new_admin = User(username=username, email=email, password=hashed_password, is_admin=True)
+        new_admin = User(username=username, email=email, password=hashed_password, is_admin=True, is_approved=True,  plan='premium')
         db.session.add(new_admin)
         db.session.commit()
 
@@ -2698,6 +2716,11 @@ def approve_users():
             user.is_approved = False
             db.session.commit()
             flash(f'{user.username} access revoked.', 'warning')
+
+        elif action == 'update_plan':
+            user.plan = request.form.get('plan', 'basic')
+            db.session.commit()
+            flash(f'Plan updated to {user.plan} for {user.username}.', 'success')
 
         elif action == 'update_permissions':
             # Update all 8 permission flags from checkboxes
@@ -3343,6 +3366,7 @@ def get_local_ip():
 # Add this route to app.py (after the transfer_stock route)
 
 @app.route('/mass-transfer-rack', methods=['GET'])
+@premium_required
 @login_required
 @permission_required('can_mass_transfer')
 def mass_transfer_rack():
@@ -3596,6 +3620,7 @@ def execute_mass_transfer():
 
 
 @app.route('/bulk-transfer-racking', methods=['GET'])
+@premium_required
 @login_required
 @permission_required('can_bulk_transfer')
 def bulk_transfer_racking():
@@ -3764,6 +3789,7 @@ def print_dn(order_id):
                            total_quantity=total_quantity,
                            total_weight=total_weight,
                            total_sku=len(unique_skus))
+
 
 if __name__ == '__main__':
     from zeroconf import ServiceInfo, Zeroconf

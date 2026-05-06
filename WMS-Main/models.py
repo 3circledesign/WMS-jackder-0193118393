@@ -103,6 +103,7 @@ class User(UserMixin, db.Model):
     is_active = db.Column(db.Boolean, default=True)
     is_approved = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)
+    plan = db.Column(db.String(20), default='basic')
 
     # ── Feature Permissions ──
     can_create_racking = db.Column(db.Boolean, default=False)
