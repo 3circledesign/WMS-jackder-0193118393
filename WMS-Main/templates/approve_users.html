@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+    <h2>User Management</h2>
+
+    {% for user in users %}
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ user.username }}</strong>
+                <span class="text-muted ms-2">{{ user.email }}</span>
+            </div>
+            <div>
+                {% if user.is_approved %}
+                    <span class="badge bg-success">Approved</span>
+                {% else %}
+                    <span class="badge bg-secondary">Pending</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Approve / Revoke -->
+            <div class="mb-3 d-flex gap-2">
+                {% if not user.is_approved %}
+                <form method="POST">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <input type="hidden" name="action" value="approve">
+                    <button class="btn btn-success btn-sm">✅ Approve</button>
+                </form>
+                {% else %}
+                <form method="POST">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <input type="hidden" name="action" value="revoke">
+                    <button class="btn btn-danger btn-sm">🚫 Revoke Access</button>
+                </form>
+                {% endif %}
+            </div>
+
+            <!-- Permission Checkboxes -->
+            {% if user.is_approved %}
+            <form method="POST">
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <input type="hidden" name="action" value="update_permissions">
+                <p class="fw-bold mb-2">Feature Access:</p>
+                <div class="row row-cols-2 row-cols-md-4 g-2 mb-3">
+                    {% set perms = [
+                        ('can_create_racking',  '🏗️ Racking Management'),
+                        ('can_create_stock',     '📦 Goods Receiving'),
+                        ('can_create_order',     '🧾 Create Order'),
+                        ('can_transfer_stock',   '🔄 Transfer Stock'),
+                        ('can_transfer_batch',   '🔃 Transfer Batch'),
+                        ('can_mass_transfer',    '🚛 Mass Transfer Rack'),
+                        ('can_bulk_transfer',    '📤 Bulk Transfer Racking'),
+                        ('can_add_sku',          '🆕 Create SKU'),
+                    ] %}
+                    {% for perm, label in perms %}
+                    <div class="col">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="{{ perm }}" id="{{ perm }}_{{ user.id }}"
+                                   {% if user|attr(perm) %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ perm }}_{{ user.id }}">
+                                {{ label }}
+                            </label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">💾 Save Permissions</button>
+            </form>
+            {% else %}
+                <p class="text-muted fst-italic">Approve the user first before setting permissions.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <p>No non-admin users registered yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<!-- Main Container -->
+<div class="container mt-5">
+    <h1 class="text-center">Dashboard</h1>
+
+<div class="text-left mb-4">
+    {% if current_user.is_admin %}
+        <a href="{{ url_for('approve_users') }}" class="btn btn-warning d-inline-block">Approve Users</a>
+    {% endif %}
+    <a href="{{ url_for('update_daily_rack_count') }}" class="btn btn-primary d-inline-block ms-2">Update Daily Rack Count</a>
+    <a href="{{ url_for('daily_rack_count') }}" class="btn btn-info d-inline-block ms-2">📊 View Daily Rack Count Data</a>
+    <a href="{{ url_for('daily_orders') }}" class="btn btn-success d-inline-block ms-2">📦 View Daily Orders</a>
+    <a href="{{ url_for('rack_status') }}" class="btn btn-secondary d-inline-block ms-2">🗄️ View Rack Status</a>
+</div>
+
+    <!-- Low Stock Alerts Threshold Form -->
+    <form method="GET" action="/dashboard" class="d-flex align-items-center mt-3">
+        <label for="threshold" class="me-2">Set Low Stock Threshold:</label>
+        <input type="number" name="threshold" id="threshold" class="form-control w-auto me-2" min="1" value="{{ low_stock_threshold }}">
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+
+    <!-- Key Statistics -->
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Total SKUs</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ total_skus }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Total Stock Quantity</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ total_stock_quantity }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">SKUs with Zero Stock</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ zero_stock_skus }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Racking Statistics -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Total Racks</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ total_racks }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Occupied Racks</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ occupied_racks }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header">Empty Racks</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ empty_racks }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Month Selector for Pallets and Orders -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <form method="GET" action="/dashboard">
+            <input type="hidden" name="month_orders" value="{{ selected_month_orders }}"> <!-- Persist Order Month -->
+            <label for="month_pallets">Select Month for Pallet Data:</label>
+            <input type="month" id="month_pallets" name="month_pallets" class="form-control" value="{{ selected_month_pallets }}">
+            <button type="submit" class="btn btn-primary mt-3">Update Pallet Data</button>
+        </form>
+    </div>
+
+    <div class="col-md-6">
+        <form method="GET" action="/dashboard">
+            <input type="hidden" name="month_pallets" value="{{ selected_month_pallets }}"> <!-- Persist Pallet Month -->
+            <label for="month_orders">Select Month for Order Data:</label>
+            <input type="month" id="month_orders" name="month_orders" class="form-control" value="{{ selected_month_orders }}">
+            <button type="submit" class="btn btn-primary mt-3">Update Order Data</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- Display Monthly Metrics -->
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-header">Monthly Average Occupied Pallets</div>
+            <div class="card-body">
+                <h2 class="card-title">{{ monthly_average_occupied_pallets|default(0)|round(2) }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-header">Monthly Total Order Items (GI)</div>
+            <div class="card-body">
+                <h2 class="card-title">{{ monthly_total_order_items }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-header">Total Weight of Issued Orders (GI)</div>
+            <div class="card-body">
+                <h2 class="card-title">{{ monthly_order_weight|default(0)|round(2) }} kg</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Low Stock Alerts -->
+<h2 class="mt-5">Low Stock Alerts (Below {{ low_stock_threshold }})</h2>
+<div class="table-responsive">
+    <table class="table table-borderless table-striped align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Material Number</th>
+                <th>Product Description</th>
+                <th>Batch Number</th>
+                <th>Total Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in low_stock_items.items %}
+            <tr>
+                <td>{{ stock.material_number }}</td>
+                <td>{{ stock.product_description }}</td>
+                <td>{{ stock.batch_number }}</td>
+                <td>{{ stock.total_quantity }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center">No low stock items.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination Controls -->
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if low_stock_items.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('dashboard', page=low_stock_items.prev_num, threshold=low_stock_threshold) }}">Previous</a>
+        </li>
+        {% endif %}
+        {% for page_num in low_stock_items.iter_pages() %}
+        {% if page_num %}
+        <li class="page-item {% if page_num == low_stock_items.page %}active{% endif %}">
+            <a class="page-link" href="{{ url_for('dashboard', page=page_num, threshold=low_stock_threshold) }}">{{ page_num }}</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">…</span></li>
+        {% endif %}
+        {% endfor %}
+        {% if low_stock_items.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('dashboard', page=low_stock_items.next_num, threshold=low_stock_threshold) }}">Next</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+
+
+    <!-- Top 5 SKUs by Quantity -->
+    <h2 class="mt-5">Top 5 SKUs by Quantity</h2>
+    <div class="table-responsive">
+        <table class="table table-borderless table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Material Number</th>
+                    <th>Product Description</th>
+                    <th>Total Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in top_skus %}
+                <tr>
+                    <td>{{ stock.material_number }}</td>
+                    <td>{{ stock.product_description }}</td>
+                    <td>{{ stock.total_quantity }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" class="text-center">No stock data available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Recent Stock Adjustments -->
+    <h2 class="mt-5">Recent Stock Adjustments</h2>
+    <div class="table-responsive">
+        <table class="table table-borderless table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Material Number</th>
+                    <th>Product Description</th>
+                    <th>Change Type</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for adjustment in recent_adjustments %}
+                <tr>
+                    <td>{{ adjustment.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ adjustment.stock.sku.material_number }}</td>
+                    <td>{{ adjustment.stock.sku.product_description }}</td>
+                    <td>{{ adjustment.change_type }}</td>
+                    <td>{{ adjustment.quantity }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">No recent adjustments.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

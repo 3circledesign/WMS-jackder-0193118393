@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Racking Management{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Create Racking</h2>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Racking Creation Form -->
+    <form method="POST" action="{{ url_for('add_racking') }}">
+        <div class="mb-3">
+            <label for="aisle" class="form-label">Aisles</label>
+            <input type="text" name="aisle" id="aisle" class="form-control" placeholder="Enter aisles separated by commas (e.g., A,B,C)" required>
+        </div>
+        <div class="mb-3">
+            <label for="level" class="form-label">Bay Quantity</label>
+            <input type="number" name="level" id="level" class="form-control" placeholder="Enter number of bay per level" min="1" required>
+        </div>
+        <div class="mb-3">
+            <label for="position" class="form-label">Levels</label>
+            <input type="number" name="position" id="position" class="form-control" placeholder="Enter number of level" min="1" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Racking</button>
+    </form>
+
+    <hr>
+
+    <h3 class="mt-4">Filter Racking by Aisle</h3>
+    <div class="aisle-buttons">
+        <!-- "Show All" Button -->
+        <a href="{{ url_for('create_racking') }}" class="btn btn-secondary">Show All</a>
+        <!-- Dynamically generate aisle buttons -->
+        {% for aisle in unique_aisles %}
+            <a href="{{ url_for('create_racking', aisle=aisle) }}" class="btn btn-primary">Aisle {{ aisle }}</a>
+        {% endfor %}
+    </div>
+
+    <h3 class="mt-4">
+        {% if selected_aisle %}
+            Racking Data for Aisle {{ selected_aisle }}
+        {% else %}
+            All Racking Data
+        {% endif %}
+    </h3>
+    {% if racking_data %}
+        <div class="table-container">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Racking Number</th>
+                        <th>Aisle</th>
+                        <th>Bay</th>
+                        <th>Level</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rack in racking_data %}
+                        <tr>
+                            <td>{{ rack.racking_number }}</td>
+                            <td>{{ rack.aisle }}</td>
+                            <td>{{ rack.level }}</td>
+                            <td>{{ rack.position }}</td>
+                            <td>
+                                <a href="{{ url_for('delete_racking', racking_number=rack.racking_number) }}" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No racking data available.</p>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+{% endblock %}

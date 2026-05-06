@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Inventory System{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* ── Base ── */
+        body {
+            background-color: #C7C7C7;
+            color: #212529;
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            background-color: #343a40;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: #adb5bd;
+            font-weight: 500;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #fff;
+        }
+
+        /* ── Layout ── */
+        .container {
+            max-width: 1200px;
+        }
+
+        /* ── Tables ── */
+        .table th, .table td {
+            padding: 1rem;
+        }
+
+        .table-container {
+            margin-top: 40px;
+        }
+
+        .flash-messages .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            min-width: 300px;
+        }
+
+        /* ── Buttons ── */
+        .btn-primary,
+        .btn-success,
+        .btn-danger,
+        .btn-warning {
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover,
+        .btn-success:hover,
+        .btn-danger:hover,
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ── Typography ── */
+        h1 { font-size: 3rem; font-weight: bold; }
+        h2 { font-size: 2rem; font-weight: bold; }
+        h4 { font-size: 1.5rem; font-weight: 500; margin-top: 2rem; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .table th, .table td {
+                font-size: 0.85rem;
+                padding: 0.75rem;
+            }
+
+            h2, h4 {
+                font-size: 1.75rem;
+            }
+        }
+
+        /* ── Print Document Styles (used by cycle count, orders etc.) ── */
+        .print-document {
+            background: white;
+            border-radius: 8px;
+            padding: 24px 28px;
+            margin-bottom: 30px;
+        }
+
+        .header {
+            margin-bottom: 12px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 6px;
+        }
+
+        .print-document .header h1 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .header-info { font-size: 9pt; }
+        .header-info div { margin: 2px 0; }
+
+        .racking-section { margin-bottom: 18px; }
+
+        .racking-header {
+            color: #000;
+            padding: 5px 8px;
+            font-weight: bold;
+            font-size: 11pt;
+            margin-bottom: 3px;
+            border: 2px solid #000;
+            border-radius: 3px;
+        }
+
+        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        .items-table th { background-color: #e0e0e0; border: 1px solid #333; padding: 3px 5px; text-align: left; font-weight: bold; font-size: 8pt; }
+        .items-table td { border: 1px solid #333; padding: 4px 5px; font-size: 8pt; }
+        .items-table td.material-col    { width: 18%; font-weight: 600; }
+        .items-table td.description-col { width: 35%; font-size: 7pt; }
+        .items-table td.batch-col       { width: 17%; }
+        .items-table td.system-qty      { width: 12%; text-align: center; }
+        .items-table td.counted-qty     { width: 18%; background-color: #f9f9f9; }
+
+        .footer { margin-top: 25px; }
+
+        .signatures { display: flex; justify-content: space-between; border-top: 1px solid #999; padding-top: 10px; }
+        .signature-box { flex: 1; padding: 0 5px; }
+        .signature-box strong { display: block; margin-bottom: 5px; font-size: 8pt; }
+        .signature-line { border-bottom: 1px solid #000; margin: 10px 0 3px 0; height: 20px; }
+        .signature-box small { font-size: 7pt; color: #666; }
+
+        /* ── Print Media ── */
+        @media print {
+            @page { size: A4 portrait; margin: 8mm 8mm 10mm 8mm; }
+
+            body            { font-size: 8pt; line-height: 1.2; background: white; }
+            .no-print       { display: none !important; }
+            .navbar         { display: none !important; }
+            .print-document { padding: 0; background: none; }
+
+            .racking-section { page-break-inside: avoid; }
+            .footer          { page-break-inside: avoid; }
+
+            .print-document .header h1      { font-size: 13pt; }
+            .racking-header                 { font-size: 10pt; }
+            .items-table th                 { font-size: 7pt; padding: 2px 4px; }
+            .items-table td                 { font-size: 7pt; padding: 3px 4px; }
+            .items-table td.description-col { font-size: 6pt; }
+        }
+
+
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 0.5rem;
+        }
+
+        .table th {
+            background-color: #495057;
+            color: #fff;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f8f9fa;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        h4 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-top: 2rem;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .form-container .card {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .link-btn {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #0d6efd;
+            background-color: #e9f2ff;
+            text-decoration: none;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .link-btn:hover {
+            color: #ffffff;
+            background-color: #0d6efd;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        .btn-warning,
+        .btn-success,
+        .btn-danger {
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-warning:hover,
+        .btn-success:hover,
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ── Per-page extra styles ── */
+        {% block extra_styles %}{% endblock %}
+    </style>
+</head>
+<body>
+
+<!-- Shared Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <img src="{{ url_for('static', filename='logo_.png') }}" alt="Logo" width="80" height="80" class="me-2">
+        <a class="navbar-brand" href="/">Inventory System</a>
+        <strong class="text-white">Welcome, {{ current_user.username }}!</strong>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+
+                {% if current_user.is_admin or current_user.can_create_racking %}
+                <li class="nav-item"><a class="nav-link" href="/create_racking">Racking Management</a></li>
+                {% endif %}
+
+                <li class="nav-item"><a class="nav-link" href="/stocks">Stock List</a></li>
+                <li class="nav-item"><a class="nav-link" href="/sku-list">SKU List</a></li>
+
+                {% if current_user.is_admin or current_user.can_create_stock %}
+                <li class="nav-item"><a class="nav-link" href="/create-stock">Goods Receiving</a></li>
+                {% endif %}
+
+                {% if current_user.is_admin or current_user.can_add_sku %}
+                <li class="nav-item"><a class="nav-link" href="/add-sku">Create SKU</a></li>
+                {% endif %}
+
+                {% if current_user.is_admin or current_user.can_create_order %}
+                <li class="nav-item"><a class="nav-link" href="/create-order">Create Order</a></li>
+                {% endif %}
+
+                {% if current_user.is_admin or current_user.can_view_orders %}
+                <li class="nav-item"><a class="nav-link" href="/orders">View Orders</a></li>
+                {% endif %}
+
+                {% if current_user.is_admin or current_user.can_cycle_count %}
+                <li class="nav-item"><a class="nav-link" href="/cycle-count">Cycle Count</a></li>
+                {% endif %}
+            </ul>
+            <form class="d-flex ms-3" action="{{ url_for('logout') }}" method="POST">
+                <button class="btn btn-sm btn-outline-light" type="submit">Logout</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Flash Messages (shared too) -->
+<div class="container mt-2 flash-messages">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<!-- Page Content -->
+{% block content %}{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>
