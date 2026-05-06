@@ -356,6 +356,110 @@
         .clear-search:hover {
             color: #333;
         }
+                .aisle-card {
+            background: white;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .aisle-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .aisle-label { font-size: 1rem; font-weight: 700; color: #343a40; }
+
+        .aisle-stats span {
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.72rem;
+        }
+
+        /* Grid layout */
+        .rack-grid-table {
+            border-collapse: separate;
+            border-spacing: 3px;
+            white-space: nowrap;
+        }
+
+        .col-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #6c757d;
+            text-align: center;
+            padding: 2px 6px;
+            min-width: 20px;
+        }
+
+        .bay-group {
+            border-left: 2px solid #dee2e6;
+            padding-left: 3px;
+        }
+
+        .bay-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #adb5bd;
+            text-align: center;
+            letter-spacing: 0.03em;
+        }
+
+        .rack-cell {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 30px;
+            border-radius: 5px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            border: 1px solid rgba(0,0,0,0.1);
+            cursor: default;
+            position: relative;
+            margin: 1px;
+        }
+
+        .rack-cell.occupied  { background-color: #d1e7dd; color: #0a3622; border-color: #a3cfbb; }
+        .rack-cell.mixed     { background-color: #fff3cd; color: #664d03; border-color: #ffda6a; }
+        .rack-cell.empty     { background-color: #f1f3f5; color: #adb5bd; border-color: #dee2e6; }
+        .rack-cell.missing   { background-color: transparent; border: 1px dashed #dee2e6; color: #ccc; }
+
+        .rack-cell .qty {
+            position: absolute;
+            top: 1px;
+            right: 3px;
+            font-size: 0.55rem;
+            opacity: 0.7;
+        }
+
+        .rack-cell .warn {
+            position: absolute;
+            bottom: 1px;
+            right: 2px;
+            font-size: 0.6rem;
+        }
+
+        .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.78rem; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+        h1 { font-size: 3rem; font-weight: bold; }
+        h2 { font-size: 2rem; font-weight: bold; }
+
+        .btn-primary, .btn-success, .btn-danger, .btn-secondary, .btn-warning {
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover, .btn-success:hover, .btn-danger:hover,
+        .btn-secondary:hover, .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
 
         /* ── Per-page extra styles ── */
         {% block extra_styles %}{% endblock %}
