@@ -2700,7 +2700,7 @@ def approve_users():
             permissions = [
                 'can_create_racking', 'can_create_stock', 'can_create_order',
                 'can_transfer_stock', 'can_transfer_batch', 'can_mass_transfer',
-                'can_bulk_transfer', 'can_add_sku'
+                'can_bulk_transfer', 'can_add_sku',  'can_view_orders', 'can_cycle_count'
             ]
             for perm in permissions:
                 setattr(user, perm, perm in request.form)
