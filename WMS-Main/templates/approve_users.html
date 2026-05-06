@@ -46,16 +46,18 @@
                 <input type="hidden" name="action" value="update_permissions">
                 <p class="fw-bold mb-2">Feature Access:</p>
                 <div class="row row-cols-2 row-cols-md-4 g-2 mb-3">
-                    {% set perms = [
-                        ('can_create_racking',  '🏗️ Racking Management'),
-                        ('can_create_stock',     '📦 Goods Receiving'),
-                        ('can_create_order',     '🧾 Create Order'),
-                        ('can_transfer_stock',   '🔄 Transfer Stock'),
-                        ('can_transfer_batch',   '🔃 Transfer Batch'),
-                        ('can_mass_transfer',    '🚛 Mass Transfer Rack'),
-                        ('can_bulk_transfer',    '📤 Bulk Transfer Racking'),
-                        ('can_add_sku',          '🆕 Create SKU'),
-                    ] %}
+                        {% set perms = [
+                            ('can_create_racking',  '🏗️ Racking Management'),
+                            ('can_create_stock',    '📦 Goods Receiving'),
+                            ('can_create_order',    '🧾 Create Order'),
+                            ('can_transfer_stock',  '🔄 Transfer Stock'),
+                            ('can_transfer_batch',  '🔃 Transfer Batch'),
+                            ('can_mass_transfer',   '🚛 Mass Transfer Rack'),
+                            ('can_bulk_transfer',   '📤 Bulk Transfer Racking'),
+                            ('can_add_sku',         '🆕 Create SKU'),
+                            ('can_view_orders',     '📋 View Orders'),
+                            ('can_cycle_count',     '🔁 Cycle Count'),
+                        ] %}
                     {% for perm, label in perms %}
                     <div class="col">
                         <div class="form-check">
