@@ -57,6 +57,9 @@
                     <td>
                         <a href="{{ url_for('view_order', order_id=order.id) }}" class="btn btn-info btn-sm">View</a>
                     </td>
+                    <td>
+                       <a href="/print-dn/{{ order.id }}" target="_blank" class="btn btn-dark btn-sm">📋 DN</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

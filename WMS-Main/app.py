@@ -3750,6 +3750,21 @@ def search_stocks_for_transfer():
 
     return jsonify({'stocks': stocks_data})
 
+@app.route('/print-dn/<int:order_id>')
+@login_required
+def print_dn(order_id):
+    """Render professional Delivery Note for printing"""
+    order = Order.query.get_or_404(order_id)
+    total_quantity = sum(item.quantity for item in order.items)
+    total_weight = sum(item.quantity * item.sku.weight for item in order.items)
+    unique_skus = {item.sku.material_number for item in order.items}
+
+    return render_template('dn_template.html',
+                           order=order,
+                           total_quantity=total_quantity,
+                           total_weight=total_weight,
+                           total_sku=len(unique_skus))
+
 if __name__ == '__main__':
     from zeroconf import ServiceInfo, Zeroconf
     import socket
