@@ -2312,7 +2312,10 @@ def print_order(order_id):
                                    akzonobel_path=url_for('static', filename='akzonobel.png', _external=True))
 
     # Configure wkhtmltopdf path
-    config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+    if platform.system() == 'Windows':
+        config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
+    else:
+        config = pdfkit.configuration(wkhtmltopdf='/usr/bin/wkhtmltopdf')
 
     # Options for PDF generation with page numbers
     options = {
