@@ -3133,30 +3133,25 @@ def toggle_order_status(order_id):
 @login_required
 @permission_required('can_cycle_count')
 def cycle_count():
-    """Print view for cycle count - grouped by racking/bay"""
     from datetime import datetime
 
     # Get filters
     selected_racking = request.args.get('racking_number', 'all')
     include_zero = request.args.get('include_zero', 'no')
+    sku_filter = request.args.get('sku_filter', '').strip()        # ← new
+    batch_filter = request.args.get('batch_filter', '').strip()    # ← new
 
     # Get all racking numbers
     all_rackings = Racking.query.order_by(Racking.racking_number).all()
 
-    # Build racking list with rack letters AND specific bays
+    # Build racking list
     racking_list = []
-
-    # Add rack letters (A, B, C, D, etc.)
     rack_letters = set()
     for r in all_rackings:
         rack_letter = r.racking_number.split('-')[0] if '-' in r.racking_number else r.racking_number[0]
         rack_letters.add(rack_letter)
-
-    # Add rack letters first
     for letter in sorted(rack_letters):
         racking_list.append(letter)
-
-    # Add specific bays
     for r in all_rackings:
         racking_list.append(r.racking_number)
 
@@ -3174,29 +3169,33 @@ def cycle_count():
 
     # Apply racking filter
     if selected_racking != 'all':
-        # If single letter (A, B, C), show all bays in that rack
         if len(selected_racking) == 1:
             query = query.filter(Stock.racking_number.like(f'{selected_racking}-%'))
         else:
-            # Specific bay
             query = query.filter(Stock.racking_number == selected_racking)
 
     # Apply zero stock filter
     if include_zero == 'no':
         query = query.filter(Stock.quantity > 0)
 
-    # Order by racking number, then material number
-    query = query.order_by(Stock.racking_number, SKU.material_number, Stock.batch_number)
+    # Apply SKU filter ← new
+    if sku_filter:
+        query = query.filter(SKU.material_number.ilike(f'%{sku_filter}%'))
 
+    # Apply batch filter ← new
+    if batch_filter:
+        query = query.filter(Stock.batch_number.ilike(f'%{batch_filter}%'))
+
+    # Order
+    query = query.order_by(Stock.racking_number, SKU.material_number, Stock.batch_number)
     stocks = query.all()
 
-    # Group by racking number (instead of material number)
+    # Group by racking number
     racking_stocks = {}
     for stock in stocks:
         rack_num = stock.racking_number
         if rack_num not in racking_stocks:
             racking_stocks[rack_num] = []
-
         racking_stocks[rack_num].append({
             'stock_id': stock.stock_id,
             'material_number': stock.material_number,
@@ -3209,10 +3208,12 @@ def cycle_count():
         })
 
     return render_template('cycle_count_print.html',
-                           racking_stocks=racking_stocks,  # Changed from sku_stocks
+                           racking_stocks=racking_stocks,
                            racking_list=racking_list,
                            selected_racking=selected_racking,
                            include_zero=include_zero,
+                           sku_filter=sku_filter,          # ← new
+                           batch_filter=batch_filter,      # ← new
                            count_date=datetime.now().strftime('%Y-%m-%d'),
                            total_stock_lines=len(stocks))
 

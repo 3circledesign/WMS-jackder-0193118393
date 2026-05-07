@@ -9,7 +9,8 @@
     <!-- Action Buttons -->
     <div class="text-left mb-4">
         <a href="/dashboard" class="btn btn-secondary d-inline-block">← Dashboard</a>
-        <a href="/cycle-count/perform?racking_number={{ selected_racking }}&include_zero={{ include_zero }}" class="btn btn-primary d-inline-block ms-2">📝 Enter Data</a>
+        <a href="/cycle-count/perform?racking_number={{ selected_racking }}&include_zero={{ include_zero }}&sku_filter={{ sku_filter }}&batch_filter={{ batch_filter }}"
+   class="btn btn-primary d-inline-block ms-2">📝 Enter Data</a>
         <button onclick="window.print()" class="btn btn-success d-inline-block ms-2">🖨️ Print</button>
     </div>
 
@@ -19,7 +20,7 @@
         <div class="card-body">
             <form method="GET" action="/cycle-count">
                 <div class="row g-3 align-items-end">
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <label for="racking_number" class="form-label fw-semibold">Racking:</label>
                         <select name="racking_number" id="racking_number" class="form-select">
                             <option value="all" {% if selected_racking == 'all' %}selected{% endif %}>All Racking</option>
@@ -43,25 +44,46 @@
                             </optgroup>
                         </select>
                     </div>
-                    <div class="col-md-4">
+
+                    <div class="col-md-3">
+                        <label for="sku_filter" class="form-label fw-semibold">SKU / Material No.:</label>
+                        <input type="text" name="sku_filter" id="sku_filter"
+                               class="form-control"
+                               placeholder="e.g. VAPE300K"
+                               value="{{ sku_filter|default('') }}">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="batch_filter" class="form-label fw-semibold">Batch Number:</label>
+                        <input type="text" name="batch_filter" id="batch_filter"
+                               class="form-control"
+                               placeholder="e.g. 2321434324"
+                               value="{{ batch_filter|default('') }}">
+                    </div>
+
+                    <div class="col-md-2">
                         <label for="include_zero" class="form-label fw-semibold">Zero Stock:</label>
                         <select name="include_zero" id="include_zero" class="form-select">
                             <option value="yes" {% if include_zero == 'yes' %}selected{% endif %}>Include</option>
                             <option value="no" {% if include_zero == 'no' %}selected{% endif %}>Exclude</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary w-100">📊 Apply</button>
+
+                    <div class="col-12 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">📊 Apply Filters</button>
+                        <a href="/cycle-count" class="btn btn-outline-secondary">✖ Clear</a>
                     </div>
                 </div>
 
-                <!-- Info -->
+                <!-- Info Bar -->
                 <div class="alert alert-info mt-3 mb-0 py-2">
                     <strong>📋 Selection:</strong>
                     {% if selected_racking == 'all' %}All Racking
                     {% elif selected_racking|length == 1 %}Rack {{ selected_racking }} - All Bays
                     {% else %}{{ selected_racking }}{% endif %}
                     &nbsp;|&nbsp; <strong>Items:</strong> {{ total_stock_lines }}
+                    {% if sku_filter %}&nbsp;|&nbsp; <strong>SKU:</strong> {{ sku_filter }}{% endif %}
+                    {% if batch_filter %}&nbsp;|&nbsp; <strong>Batch:</strong> {{ batch_filter }}{% endif %}
                     &nbsp;|&nbsp; <strong>Zero Stock:</strong> {% if include_zero == 'yes' %}Included{% else %}Excluded{% endif %}
                 </div>
             </form>
