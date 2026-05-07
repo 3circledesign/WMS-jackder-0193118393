@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+{% block title %}Upgrade to Premium{% endblock %}
+
+{% block extra_styles %}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
+
+.upgrade-wrapper {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.upgrade-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.10);
+    max-width: 860px;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.upgrade-left {
+    background: #1a1a2e;
+    color: #fff;
+    padding: 52px 44px;
+    flex: 0 0 340px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+.upgrade-left::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255,215,0,0.06);
+}
+
+.upgrade-left::after {
+    content: '';
+    position: absolute;
+    bottom: -40px;
+    left: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+}
+
+.lock-icon {
+    width: 56px;
+    height: 56px;
+    background: rgba(255,215,0,0.12);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    font-size: 26px;
+}
+
+.upgrade-left h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 1.25;
+    margin: 0 0 16px 0;
+    color: #fff;
+}
+
+.upgrade-left p {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.7;
+    margin: 0 0 36px 0;
+}
+
+.plan-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,215,0,0.12);
+    border: 1px solid rgba(255,215,0,0.25);
+    color: #ffd700;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+}
+
+.contact-hint {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.35);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 20px;
+    margin-top: 20px;
+    line-height: 1.6;
+}
+
+.upgrade-right {
+    padding: 52px 44px;
+    flex: 1;
+}
+
+.upgrade-right h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: #1a1a2e;
+    margin: 0 0 8px 0;
+}
+
+.upgrade-right .subtitle {
+    font-size: 0.85rem;
+    color: #888;
+    margin: 0 0 32px 0;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 36px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 10px;
+    background: #f8f8fc;
+    border: 1px solid #f0f0f8;
+    transition: border-color 0.2s ease;
+}
+
+.feature-item:hover {
+    border-color: #d0d0e8;
+}
+
+.feature-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #1a1a2e;
+    color: #ffd700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.feature-text strong {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 2px;
+}
+
+.feature-text span {
+    font-size: 0.75rem;
+    color: #999;
+    line-height: 1.4;
+}
+
+.divider {
+    height: 1px;
+    background: #f0f0f0;
+    margin-bottom: 28px;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.btn-contact {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #1a1a2e;
+    color: #ffd700;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 12px 26px;
+    border-radius: 10px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-contact:hover {
+    background: #2a2a4e;
+    transform: translateY(-1px);
+    color: #ffd700;
+    text-decoration: none;
+}
+
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    color: #aaa;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.83rem;
+    font-weight: 500;
+    padding: 12px 18px;
+    border-radius: 10px;
+    text-decoration: none;
+    border: 1px solid #e8e8e8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+    color: #555;
+    border-color: #ccc;
+    text-decoration: none;
+}
+
+@media (max-width: 700px) {
+    .upgrade-card {
+        flex-direction: column;
+    }
+
+    .upgrade-left {
+        flex: none;
+        padding: 36px 28px;
+    }
+
+    .upgrade-right {
+        padding: 36px 28px;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+}
+{% endblock %}
+
+{% block content %}
+<div class="upgrade-wrapper">
+    <div class="upgrade-card">
+
+        <!-- Left Panel -->
+        <div class="upgrade-left">
+            <div>
+                <div class="lock-icon">🔒</div>
+                <div class="plan-badge">⭐ Premium Plan</div>
+                <h2>Unlock Full Access</h2>
+                <p>Your current account is on the Basic plan. Upgrade to Premium to access the complete warehouse management suite.</p>
+            </div>
+            <div class="contact-hint">
+                Contact your system administrator to request a plan upgrade for your account.
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="upgrade-right">
+            <h3>What's included in Premium</h3>
+            <p class="subtitle">Everything you need to manage your warehouse end-to-end.</p>
+
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">
+                        <strong>Dashboard</strong>
+                        <span>Analytics & KPI overview</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🏗️</div>
+                    <div class="feature-text">
+                        <strong>Racking Management</strong>
+                        <span>Create & manage rack locations</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📦</div>
+                    <div class="feature-text">
+                        <strong>Goods Receiving</strong>
+                        <span>Stock intake & GR processing</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🧾</div>
+                    <div class="feature-text">
+                        <strong>Order Management</strong>
+                        <span>Create, view & print orders</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔄</div>
+                    <div class="feature-text">
+                        <strong>Stock Transfers</strong>
+                        <span>Rack, batch & bulk transfers</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔁</div>
+                    <div class="feature-text">
+                        <strong>Cycle Count</strong>
+                        <span>Physical stock verification</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📋</div>
+                    <div class="feature-text">
+                        <strong>Delivery Notes</strong>
+                        <span>Professional DN printing</span>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📤</div>
+                    <div class="feature-text">
+                        <strong>Excel Export</strong>
+                        <span>Export stock & order data</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="actions">
+                <a href="mailto:admin@yourcompany.com" class="btn-contact">
+                    ✉️ Contact Admin
+                </a>
+                <form action="{{ url_for('logout') }}" method="POST" style="margin:0;">
+                    <button type="submit" class="btn-logout">
+                        ← Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

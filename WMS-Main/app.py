@@ -48,13 +48,11 @@ def premium_required(f):
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
             return redirect(url_for('login'))
-        if current_user.is_admin:
+        if current_user.is_admin or current_user.plan == 'premium':
             return f(*args, **kwargs)
-        if current_user.plan != 'premium':
-            flash('This feature requires a Premium plan.', 'warning')
-            return redirect(url_for('dashboard'))
-        return f(*args, **kwargs)
+        return redirect(url_for('upgrade'))
     return decorated_function
+
 
 def permission_required(permission):
     """Decorator: admin always passes. Non-admins need the specific permission."""
@@ -81,6 +79,11 @@ def load_user(user_id):
 @login_required
 def index():
     return render_template('index.html')
+
+@app.route('/upgrade')
+@login_required
+def upgrade():
+    return render_template('upgrade.html')
 
 @app.route('/inventory-sync')
 def inventory_sync():
