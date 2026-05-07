@@ -1179,7 +1179,6 @@ def daily_orders():
     )
 
 @app.route('/dashboard', methods=['GET'])
-@premium_required
 @login_required
 def dashboard():
     # Pagination parameters
