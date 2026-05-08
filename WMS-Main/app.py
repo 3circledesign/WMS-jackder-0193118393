@@ -714,23 +714,23 @@ def check_racking_capacity():
     warning_msg = None
 
     if current_items:
-        # If rack already has stock, try to get capacity from existing items
-        caps = []
-        for s in current_items:
-            sku = SKU.query.get(s.sku_id)
-            if sku and getattr(sku, 'pack_size', None) and getattr(sku.pack_size, 'max_capacity', None) is not None:
-                try:
-                    caps.append(int(sku.pack_size.max_capacity))
-                except Exception:
-                    pass
         if incoming_cap is not None:
-            caps.append(incoming_cap)
-
-        if caps:
-            max_capacity = min(caps)  # tightest rule wins
+            # Always use the incoming SKU's own pack size capacity
+            max_capacity = incoming_cap
         else:
-            # No pack sizes configured - allow but warn
-            warning_msg = f'Capacity check skipped for {racking_number}. No pack sizes configured for items in this rack.'
+            # Incoming SKU has no pack size — fall back to existing items
+            caps = []
+            for s in current_items:
+                sku = SKU.query.get(s.sku_id)
+                if sku and getattr(sku, 'pack_size', None) and getattr(sku.pack_size, 'max_capacity', None) is not None:
+                    try:
+                        caps.append(int(sku.pack_size.max_capacity))
+                    except Exception:
+                        pass
+            if caps:
+                max_capacity = min(caps)
+            else:
+                warning_msg = f'Capacity check skipped for {racking_number}. No pack sizes configured.'
     else:
         # Rack is empty
         if incoming_cap is not None:
